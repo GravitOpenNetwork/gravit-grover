@@ -1,0 +1,19 @@
+version: '3'
+services:
+  node1:
+    build: .
+    environment:
+      - NODE_ID=validator-1
+      - PEERS=node2:50051,node3:50051
+    ports:
+      - "50051:50051"
+  node2:
+    build: .
+    environment:
+      - NODE_ID=validator-2
+      - PEERS=node1:50051,node3:50051
+  node3:
+    build: .
+    environment:
+      - NODE_ID=validator-3
+      - PEERS=node1:50051,node2:50051

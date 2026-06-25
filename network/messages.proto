@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message Hypothesis {
+    string id = 1;
+    string content = 2;
+    float weight = 3;
+}
+
+message GossipMessage {
+    string node_id = 1;
+    repeated Hypothesis hypotheses = 2;
+    int64 timestamp = 3;
+    bytes signature = 4; // Подпись узла
+}
