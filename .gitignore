@@ -1,16 +1,46 @@
-STRUCTURE.md
+# Python
 __pycache__/
 *.py[cod]
+*.class
 *.so
 .Python
 env/
 venv/
-.env
-.venv
-.pytest_cache/
-.coverage
-htmlcov/
+.venv/
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+!experiments/notebooks/*.ipynb
+
+# IDE
 .vscode/
 .idea/
-*.log
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Data
+data/
+*.pkl
+*.h5
+*.pt
+
+# Environment
+.env
+.env.local
+
+STRUCTURE*.md
+
+tmp_*

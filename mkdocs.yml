@@ -1,0 +1,32 @@
+site_name: Gravit Grover Network
+site_url: https://gravitopen.github.io/gravit-grover
+repo_url: https://github.com/GravitOpenNetwork/gravit-grover
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: indigo
+    accent: indigo
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Gower Layer: architecture/gower_layer.md
+      - Consensus: architecture/consensus.md
+      - Security: architecture/security.md
+  - API Reference: api/
+  - Experiments: experiments/
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - tables
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

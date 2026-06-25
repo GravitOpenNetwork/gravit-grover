@@ -1,0 +1,322 @@
+openapi: 3.0.0
+info:
+  title: Gravit Grover Network API
+  version: 1.0.0
+  description: API for interacting with Gravit Grover Network nodes
+  contact:
+    name: GravitOpenNetwork
+    url: https://github.com/GravitOpenNetwork/gravit-grover
+
+servers:
+  - url: https://api.gravitgrover.net/v1
+    description: Production server
+  - url: http://localhost:8080/v1
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Node is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /nodes:
+    get:
+      summary: Get connected nodes
+      operationId: getNodes
+      tags:
+        - Network
+      responses:
+        '200':
+          description: List of nodes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nodes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NodeInfo'
+
+  /hypotheses:
+    post:
+      summary: Propose new hypothesis
+      operationId: proposeHypothesis
+      tags:
+        - Hypotheses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HypothesisProposal'
+      responses:
+        '201':
+          description: Hypothesis accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HypothesisResponse'
+        '400':
+          description: Invalid hypothesis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get all hypotheses
+      operationId: getHypotheses
+      tags:
+        - Hypotheses
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of hypotheses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  hypotheses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Hypothesis'
+
+  /hypotheses/{id}:
+    get:
+      summary: Get hypothesis by ID
+      operationId: getHypothesis
+      tags:
+        - Hypotheses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hypothesis details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hypothesis'
+        '404':
+          description: Hypothesis not found
+
+  /consensus:
+    get:
+      summary: Get consensus state
+      operationId: getConsensusState
+      tags:
+        - Consensus
+      responses:
+        '200':
+          description: Current consensus state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsensusState'
+
+  /consensus/round:
+    post:
+      summary: Initiate consensus round
+      operationId: startConsensusRound
+      tags:
+        - Consensus
+      responses:
+        '202':
+          description: Consensus round started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  round_id:
+                    type: string
+
+  /metrics:
+    get:
+      summary: Get node metrics
+      operationId: getMetrics
+      tags:
+        - Metrics
+      responses:
+        '200':
+          description: Current node metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metrics'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        version:
+          type: string
+        node_id:
+          type: string
+        peers:
+          type: integer
+
+    NodeInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        address:
+          type: string
+        status:
+          type: string
+        reputation:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        connected_since:
+          type: string
+          format: date-time
+
+    HypothesisProposal:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+        features:
+          type: object
+          additionalProperties:
+            type: number
+        source:
+          type: string
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+
+    Hypothesis:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        features:
+          type: object
+        weight:
+          type: number
+          format: float
+        consistency_score:
+          type: number
+          format: float
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ConsensusState:
+      type: object
+      properties:
+        round_id:
+          type: string
+        status:
+          type: string
+          enum: [idle, running, completed, failed]
+        hypotheses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hypothesis'
+        convergence:
+          type: number
+          format: float
+        entropy:
+          type: number
+          format: float
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    Metrics:
+      type: object
+      properties:
+        messages_sent:
+          type: integer
+        messages_received:
+          type: integer
+        consensus_rounds:
+          type: integer
+        avg_latency:
+          type: number
+          format: float
+        failure_rate:
+          type: number
+          format: float
+        uptime:
+          type: number
+          format: float
+        memory_usage:
+          type: integer
+        cpu_usage:
+          type: number
+          format: float
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
