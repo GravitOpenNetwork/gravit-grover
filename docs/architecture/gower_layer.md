@@ -9,7 +9,10 @@ The Gower Similarity Layer provides geometric representation of the hypothesis s
 ### Gower Similarity Coefficient
 
 For two observations i and j, the Gower similarity is:
+
+```math
 S(i, j) = (Σ_k w_k · s_k(i, j)) / (Σ_k w_k)
+```
 
 Where:
 - w_k: Weight for feature k
@@ -18,29 +21,44 @@ Where:
 ### Feature Types
 
 #### Numeric Features
+
+```math
 s_k(i, j) = 1 - |x_ik - x_jk| / R_k
+```
 
 Where R_k is the range of feature k.
 
 #### Categorical Features
+
+```math
 s_k(i, j) = {
 1, if x_ik = x_jk
 0, otherwise
 }
+```
 
 #### Ordinal Features
+
+```math
 s_k(i, j) = 1 - |rank(x_ik) - rank(x_jk)| / (R_k - 1)
+```
 
 #### Binary Features
+
+```math
 s_k(i, j) = {
 1, if x_ik = x_jk
 0, otherwise
 }
+```
 
 ## Distance Computation
 
 ### Gower Distance
+
+```math
 d(i, j) = 1 - S(i, j)
+```
 
 ### Properties
 - **Non-negativity**: d(i, j) ≥ 0
@@ -50,10 +68,13 @@ d(i, j) = 1 - S(i, j)
 ## Similarity Matrix
 
 ### Construction
+
+```math
 S = [[S_11, S_12, ..., S_1n],
 [S_21, S_22, ..., S_2n],
 [... ],
 [S_n1, S_n2, ..., S_nn]]
+```
 
 ### Properties
 - **Diagonal**: S_ii = 1
@@ -65,12 +86,18 @@ S = [[S_11, S_12, ..., S_1n],
 ### Embedding
 
 Hypotheses embedded in similarity space:
+
+```math
 φ: H → ℝᵈ
+```
 
 Where d is the number of features.
 
 ### Distance Matrix
+
+```math
 D_ij = d(i, j) = 1 - S_ij
+```
 
 ### Similarity Clustering
 
@@ -92,19 +119,24 @@ def cluster_hypotheses(similarity_matrix: np.ndarray,
     )
     return clustering.fit_predict(distance_matrix)
 ```
+
 ## Consistency Scoring
+
 ### Definition
+
 Consistency of hypothesis h with reference set R:
 
+```math
 C(h, R) = (1/|R|) Σ_{r∈R} S(h, r)
+```
+
 ## Applications
-Outlier Detection: Low consistency indicates anomaly
-
-Quality Filtering: Keep only consistent hypotheses
-
-Weight Adjustment: Use consistency as weight factor
+1. Outlier Detection: Low consistency indicates anomaly
+2. Quality Filtering: Keep only consistent hypotheses
+3. Weight Adjustment: Use consistency as weight factor
 
 ### Implementation
+
 ```python
 def compute_consistency(hypothesis: np.ndarray,
                        reference_set: np.ndarray,
@@ -118,41 +150,56 @@ def compute_consistency(hypothesis: np.ndarray,
     return np.mean(scores)
 ```
 ## Weighted Gower
+
 ### Feature Weighting
 
+```math
 S_weighted(i, j) = (Σ_k w_k · s_k(i, j)) / (Σ_k w_k)
+```
+
 ### Weight Selection
-Uniform: w_k = 1
 
-Expert: Based on domain knowledge
-
-Learned: Optimized through training
+1. Uniform: w_k = 1
+2. Expert: Based on domain knowledge
+3. Learned: Optimized through training
 
 ### Adaptive Weights
 Weights can be learned through iterations:
 
+```math
 w_k(t+1) = w_k(t) · exp(η · ∂L/∂w_k)
+```
+
 ## Applications
+
 1. Hypothesis Similarity
+
 ```python
 # Example: Computing hypothesis similarity
 gower = GowerDistance()
 hypothesis_features = extract_features(hypotheses)
 similarities = gower.compute_similarity_matrix(hypothesis_features)
 ```
+
 2. Hypothesis Clustering
+
 ```python
 Example: Clustering similar hypotheses
 clusters = cluster_hypotheses(similarities, n_clusters=3)
 ```
+
 3. Hypothesis Ranking
+
 ```python
 # Example: Ranking hypotheses by consistency
 consistency_scores = compute_all_consistencies(hypotheses, similarities)
 ranked_hypotheses = hypotheses[np.argsort(consistency_scores)]
 ```
+
 ## Performance Optimization
+
 ### Memoization
+
 ```python
 class GowerDistance:
     def __init__(self):
@@ -167,7 +214,9 @@ class GowerDistance:
         self.cache[key] = result
         return result
 ```
+
 ### Vectorization
+
 ```python
 def compute_similarity_matrix_vectorized(data: np.ndarray) -> np.ndarray:
     """
